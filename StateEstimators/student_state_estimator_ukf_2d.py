@@ -311,16 +311,19 @@ class UKFStateEstimator2D(object):
         returns: A NumPy array that is the prior state estimate. Array
                  dimensions must be the same as the state vector x.
         """
-        # TODO: Implement this method, following the math that you derived.
-        pass
+        # Implement this method, following the math that you derived.
+        A = np.array([1, dt], [0,1])
+        B = np.array([0.5*dt**2], [dt])
+        return A@x + B@u
         
     def measurement_function(self, x):
         """
-        TODO: Transform the state x into measurement space.
+         Transform the state x into measurement space.
         
         x : current state. A NumPy array
         """
-        pass
+        C = np.array([1,0])
+        return C@x
         
     def start_loop(self):
         """
