@@ -140,10 +140,10 @@ class UKFStateEstimator2D(object):
         # TODO: Tune appropriately. Currently just a guess
         self.ukf.Q = np.diag([0.01, 1.0])*0.005
         
-        # TODO: Initialize the measurement covariance matrix R
+        # Initialize the measurement covariance matrix R
         # with range variance (m^2), determined experimentally in a static
         # setup with mean range around 0.335 m:
-        self.ukf.R = np.array([?])
+        self.ukf.R = np.array([4.325768932713897e-06])
         
     def update_input_time(self, msg):
         """
@@ -239,12 +239,14 @@ class UKFStateEstimator2D(object):
             self.update_input_time(data)
         else:
             self.initialize_input_time(data)
-            # TODO: Got an initial range sensor reading, so update the initial state
+            #  Got an initial range sensor reading, so update the initial state
             # vector of the UKF
+            self.ukf.x = np.array([tof_height], [0])
             
-            # TODO: initialize the state covariance matrix to reflect estimated
+            #  initialize the state covariance matrix to reflect estimated
             # measurement error. Variance of the measurement -> variance of
             # the corresponding state variable
+            self.ukf.P = np.array([self.ukf.R[0],0],[0,0])
             
             self.got_ir = True
             self.check_if_ready_to_filter()
