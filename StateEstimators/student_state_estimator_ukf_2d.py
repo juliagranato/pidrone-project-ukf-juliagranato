@@ -329,7 +329,7 @@ class UKFStateEstimator2D(object):
         # Implement this method, following the math that you derived.
         A = np.array([1, dt], [0,1])
         B = np.array([0.5*dt**2], [dt])
-        return A@x + B@u
+        return np.dot(A, x) + B*u[0]
         
     def measurement_function(self, x):
         """
@@ -338,7 +338,7 @@ class UKFStateEstimator2D(object):
         x : current state. A NumPy array
         """
         C = np.array([1,0])
-        return C@x
+        return np.dot(C,x)
         
     def start_loop(self):
         """
