@@ -223,9 +223,6 @@ class UKFStateEstimator2D(object):
             self.ukf.Q = np.diag([0.01, 1.0])*0.0005
         else:
             self.ukf.Q = np.diag([0.01, 1.0])*0.005
-        self.update_input_time(data)
-        self.ukf_predict()
-        self.publish_current_state()
         self.in_callback = False
         
                         
@@ -261,9 +258,6 @@ class UKFStateEstimator2D(object):
             
             self.got_ir = True
             self.check_if_ready_to_filter()
-        self.ukf_predict()
-        self.ukf.update(self.last_measurement_vector)
-        self.publish_current_state()
         self.in_callback = False
             
     def check_if_ready_to_filter(self):
