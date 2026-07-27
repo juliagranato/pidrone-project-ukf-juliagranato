@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{amsmath} % for math stuff
+\usepackage{graphicx} % for inserting graphics
+\usepackage{xcolor} % for text coloring
+
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{#1}}}
+
+\title{UKF with 2D State Vector}
+\author{}
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\section{Design}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Vector}
+
+\begin{equation}
+  \mathbf{x}_t=\begin{bmatrix}
+  z \\
+  \dot z
+  \end{bmatrix}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prediction Step}
+
+\subsubsection{Control Input}
+
+\begin{equation}
+  \mathbf{u}_t = \begin{bmatrix}
+  \ddot z
+  \end{bmatrix}
+\end{equation}
+
+\subsubsection{State Transition Function}
+
+\begin{equation}
+  g(\mathbf{x}_{t-\Delta t}, \mathbf{u}_t, \Delta t) = \begin{bmatrix}
+  1 & \Delta t \\
+  0 & 1
+\end{bmatrix}\mathbf{x}_{t-\Delta t} + \begin{bmatrix}
+  \frac{1}{2}(\Delta t)^2 \\
+  \Delta t
+  \end{bmatrix}\mathbf{u}_t
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Measurement Update Step}
+
+\subsubsection{Measurement Vector}
+
+\begin{equation}
+  \mathbf{z}_t = \begin{bmatrix}
+  r
+  \end{bmatrix}
+\end{equation}
+
+\subsubsection{Measurement Function}
+
+\begin{equation}
+  h(\mathbf{\bar x}_t) = \begin{bmatrix}
+  1 & 0
+  \end{bmatrix}\mathbf{\bar x}_t
+\end{equation}
+
+\subsubsection{Measurement Covariance Matrix}
+
+Populate the measurement covariance matrix $\mathbf{R}_t$ with a reasonable value for the variance $\sigma^2_r$ of the range reading $r$.
+
+\begin{equation}
+  \mathbf{R}_t = \begin{bmatrix}
+  4.325768932713897\mathrm{e}{-06}
+  \end{bmatrix}
+\end{equation}
+
+\noindent \includegraphics[]{range_variance.png}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+
+\subsection{Initializing $\dot z$}
+ To initialize $\dot z$, you could collect 2 readings before initializing the state. Then you could estimate the initial velocity by subtracting the first measurement from the second measurement and divide by the interval between them. Although it involves waiting for multiple measurements to initialize the filter, this method would give a more accurate estimate of the drone's initial state than just setting $\dot z=0$ if the filter is launched while the drone is in motion. In practice, the filter will be launched before takeoff, when the drone is stationary on the ground. In this case, the drone's state has an initial $\dot z = 0$, and any nonzero initial velocity calculated would be due to errors/noise in the sensor readings. When the filter is initialized on a stationary drone, it makes more sense to initialize the state with $\dot z = 0$.
+
+\subsection{Consecutive Predictions vs. Updates}
+The predict step uses the control input to estimate the state at the current time. The update step corrects this state estimate based on the current measurement readings. It is reasonable to do multiple consecutive predict steps because the state is constantly changing with time and the filter can make a new prediction of the state with every new control input without needing to correct for measurements. If multiple update steps are done without prediction steps in between, the state estimate will  not factor in control inputs that occurred in between update steps. Subsequent update steps  add further corrections to an old state prediction instead of correcting a current state prediction. With multiple consecutive update steps, the stored state estimate is outdated and the measurement corrections do not help to make the stored estimate a more accurate assessment of the current state.
+
+\subsection{Comparison of UKF to EMA Filter}
+
+EMA filters tend to lag as direction changes because its estimate is heavily influenced by previous values. Kalman filters, on the other hand, predict the next state before receiving a measurement, meaning they are subject to less lag. The Kalman filter also estimates error covariance, which provides the ability to assess uncertainty and the reliability of state estimates. 
+In experiments with the drone, the raw IR readings were relatively noise free. This makes it apparent that the UKF smoothing more closely follows the actual IR readings with less lag. The UKF estimate is also smoother and does not have as many sharp points, whereas the EMA filter includes sharp changes that are not reflected in the original IR readings.
+\noindent \includegraphics[]{raw_and_ema.png} \\
+\noindent \includegraphics[]{ukf_and_raw.png}
+\end{document}
