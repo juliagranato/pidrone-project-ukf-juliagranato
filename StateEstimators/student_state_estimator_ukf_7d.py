@@ -156,7 +156,7 @@ class UKFStateEstimator7D(object):
         # Initialize state covariance matrix P:
         # TODO: Initialize the state covariance matrix P
         # self.ukf.P = ?
-        self.ukf.P = np.zeros((self.measurement_vector_dim, self.measurement_vector_dim))
+        self.ukf.P = np.diag([0.1,0.1,0.1,0.2,0.2,0.2, 0.0005])
         # Initialize the process noise covariance matrix Q:
         # TODO: Tune appropriately. Currently just a guess
         self.ukf.Q = np.diag([0.01, 0.01, 0.01, 1.0, 1.0, 1.0, 0.1])*0.005
@@ -361,7 +361,7 @@ class UKFStateEstimator7D(object):
             # the corresponding state variable
             self.ukf.P[0,0] = self.measurement_cov_camera_pose[0,0]
             self.ukf.P[1,1] = self.measurement_cov_camera_pose[1,1]
-            self.ukf.P[5,5] = self.measurement_cov_camera_pose[2,2]
+            self.ukf.P[6,6] = self.measurement_cov_camera_pose[2,2]
             self.check_if_ready_to_filter()
         self.in_callback = False
             
