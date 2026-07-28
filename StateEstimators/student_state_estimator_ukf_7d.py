@@ -471,13 +471,13 @@ class UKFStateEstimator7D(object):
         #       global frame.
         u_global = self.apply_quaternion_vector_rotation(u, x[6])
         dt_squared = dt**2
-        return x + np.array([[x[3] * dt + 0.5 * u_global[0] * dt_squared],
-                            [x[4] * dt + 0.5 * u_global[1] * dt_squared],
-                            [x[5] * dt + 0.5 * u_global[2] * dt_squared],
-                            [u_global[0] * dt],
-                            [u_global[1] * dt],
-                            [u_global[2] * dt],
-                            [0.0]])
+        return x + np.array([x[3] * dt + 0.5 * u_global[0] * dt_squared,
+                            x[4] * dt + 0.5 * u_global[1] * dt_squared,
+                            x[5] * dt + 0.5 * u_global[2] * dt_squared,
+                            u_global[0] * dt,
+                            u_global[1] * dt,
+                            u_global[2] * dt,
+                            0.0])
                                  
         
     def measurement_function(self, x):
