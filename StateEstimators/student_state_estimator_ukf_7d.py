@@ -487,12 +487,12 @@ class UKFStateEstimator7D(object):
         x : current state. A NumPy array
         """
         roll, pitch, yaw = self.get_r_p_y()
-        return np.array([[x[2]/(np.cos(roll)*np.cos(pitch))],
-                        [x[0]],
-                        [x[1]],
-                        [x[3]],
-                        [x[4]],
-                        [x[6]]])
+        return np.array([x[2]/(np.cos(roll)*np.cos(pitch)),
+                        x[0],
+                        x[1],
+                        x[3],
+                        x[4],
+                        x[6]])
     def start_loop(self):
         """
         Begin the UKF's loop of predicting and updating. Publish a state
